@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>NOXY Fx — Edit Without Limits</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{--bg:#050705;--card:#0b100d;--text:#f1fff6;--muted:#829088;--green:#39ff88;--border:#1c2921}
+*{box-sizing:border-box;margin:0;padding:0}body{background:var(--bg);color:var(--text);font-family:Arial,sans-serif}a{text-decoration:none;color:inherit}button,input,textarea,select{font:inherit}
+nav{height:70px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 6%;position:sticky;top:0;background:#050705ee;backdrop-filter:blur(14px);z-index:5}.logo{font-size:24px;font-weight:900;letter-spacing:2px}.logo span{color:var(--green)}nav a{color:#aab6ae;margin-left:20px;font-size:14px}.admin-link{border:1px solid var(--green);color:var(--green)!important;padding:8px 13px;border-radius:7px}
+.hero{max-width:1200px;margin:auto;padding:100px 6% 70px}.hero small{color:var(--green);letter-spacing:3px;font-weight:bold}.hero h1{font-size:clamp(48px,8vw,90px);line-height:.94;letter-spacing:-4px;margin:18px 0}.hero h1 span{color:var(--green)}.hero p{max-width:620px;color:var(--muted);font-size:17px;line-height:1.7}.btn{display:inline-block;border:0;background:var(--green);color:#031008;padding:13px 22px;border-radius:7px;font-weight:bold;margin-top:25px;cursor:pointer}
+.container,.admin,.detail-page{max-width:1200px;margin:auto;padding:35px 6% 80px}.head{display:flex;justify-content:space-between;gap:15px;align-items:center;margin-bottom:22px}.head h2{font-size:28px}.search{width:290px;max-width:100%;background:var(--card);border:1px solid var(--border);color:#fff;padding:12px;border-radius:7px}.cats{display:flex;gap:9px;overflow:auto;margin-bottom:22px}.cat{white-space:nowrap;background:var(--card);border:1px solid var(--border);color:#aaa;padding:8px 15px;border-radius:30px}.cat.active{background:var(--green);color:#001b09;border-color:var(--green)}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}.card{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden}.thumb{height:190px;background:radial-gradient(circle,#173d28,#071009 65%);display:flex;align-items:center;justify-content:center}.thumb img{width:100%;height:100%;object-fit:cover}.noxy{color:#245237;font-weight:900;letter-spacing:5px;font-size:24px}.body{padding:17px}.badge{display:inline-block;font-size:11px;color:var(--green);background:#123522;padding:5px 9px;border-radius:4px}.body h3{margin:10px 0 7px}.meta{color:var(--muted);font-size:12px}.foot{display:flex;justify-content:space-between;margin-top:16px}.view{color:var(--green);font-weight:bold;font-size:12px}
+.detail-page{max-width:1000px}.big-thumb{height:440px;background:#0b100d;border:1px solid var(--border);border-radius:12px;display:flex;align-items:center;justify-content:center;overflow:hidden;margin-top:20px}.big-thumb img{width:100%;height:100%;object-fit:cover}.detail-page h1{font-size:44px;margin:25px 0 10px}.info{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:25px 0}.box{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:15px}.box small{display:block;color:var(--muted);margin-bottom:6px}.desc{color:var(--muted);line-height:1.7}.download{display:inline-block;background:var(--green);color:#031008;font-weight:900;padding:16px 25px;border-radius:7px;margin-top:20px}
+.form{background:var(--card);border:1px solid var(--border);padding:25px;border-radius:12px}.form h2{margin-bottom:22px}.form label{display:block;color:#b9c4bd;font-size:13px;margin:14px 0 7px}.form input,.form textarea,.form select{width:100%;background:#070a08;color:#fff;border:1px solid var(--border);padding:12px;border-radius:6px}.form textarea{min-height:100px}.file{padding:9px!important}.preview{width:100%;max-height:220px;object-fit:contain;background:#050505;border:1px solid var(--border);border-radius:8px;margin-top:10px}.msg{margin-top:14px;color:var(--muted)}.row{display:flex;justify-content:space-between;gap:15px;align-items:center;padding:14px;border:1px solid var(--border);background:var(--card);border-radius:8px;margin-top:10px}.delete{background:transparent;color:#ff6666;border:1px solid #733;border-radius:5px;padding:8px 12px}footer{border-top:1px solid var(--border);text-align:center;padding:35px;color:#657069;font-size:13px}.hidden{display:none!important}
+@media(max-width:800px){nav a:not(.admin-link){display:none}.hero{padding-top:70px}.grid{grid-template-columns:1fr}.head{flex-direction:column;align-items:stretch}.search{width:100%}.info{grid-template-columns:1fr 1fr}.big-thumb{height:260px}.detail-page h1{font-size:32px}}
+</style>
+</head>
+<body>
+<nav><a href="./" class="logo">NOXY<span>FX</span></a><div><a href="./">Home</a><a href="#clips">Clips</a><a class="admin-link" href="?admin=1">Admin</a></div></nav>
+
+<main id="home">
+<section class="hero"><small>THE EDITOR'S RESOURCE</small><h1>EDIT WITHOUT<br><span>LIMITS.</span></h1><p>High-quality reversed clips, Twixtors and editing resources for creators.</p><a class="btn" href="#clips">EXPLORE CLIPS</a></section>
+<section class="container" id="clips"><div class="head"><h2>Recently Added</h2><input id="search" class="search" placeholder="Search clips..."></div>
+<div class="cats"><button class="cat active" data-cat="All">All</button><button class="cat" data-cat="Twixtor">Twixtor</button><button class="cat" data-cat="Reversed">Reversed</button><button class="cat" data-cat="Other">Other</button></div>
+<div id="grid" class="grid"><div class="meta">Loading clips...</div></div></section></main>
+
+<section id="detailPage" class="detail-page hidden"><div id="detail"></div></section>
+
+<section id="adminPage" class="admin hidden">
+<div id="loginBox" class="form"><h2>NOXY Fx Admin</h2><label>Email</label><input id="email" type="email" placeholder="Admin email"><label>Password</label><input id="password" type="password" placeholder="Password"><button id="loginBtn" class="btn">LOGIN</button><p id="loginMsg" class="msg"></p></div>
+<div id="dashboard" class="hidden">
+<div class="form"><h2>Add New Clip</h2>
+<label>Title *</label><input id="title" placeholder="Example: Thor Twixtor">
+<label>Category</label><select id="category"><option>Twixtor</option><option>Reversed</option><option>Other</option></select>
+<label>Quality</label><input id="quality" value="4K">
+<label>FPS</label><input id="fps" value="60">
+<label>Duration</label><input id="duration" placeholder="00:15">
+<label>Creator</label><input id="creator" value="NOXY Fx">
+<label>Tags</label><input id="tags" placeholder="thor, marvel, twixtor">
+<label>Description</label><textarea id="description" placeholder="Describe the clip..."></textarea>
+
+<label>Thumbnail — choose from your phone gallery</label>
+<input id="thumbnailFile" class="file" type="file" accept="image/jpeg,image/png,image/webp">
+<img id="thumbnailPreview" class="preview hidden" alt="Thumbnail preview">
+
+<label>Google Drive Download URL *</label>
+<input id="drive" type="url" placeholder="https://drive.google.com/...">
+
+<button id="publishBtn" class="btn">PUBLISH CLIP</button><p id="addMsg" class="msg"></p>
+</div>
+<div class="admin-list"><h2 style="margin:35px 0 15px">Your Clips</h2><div id="adminClips"></div></div>
+<button id="logoutBtn" class="btn" style="background:transparent;color:#fff;border:1px solid var(--border)">LOGOUT</button>
+</div></section>
+
+<footer>© 2026 NOXY Fx — Edit Without Limits.</footer>
+
+<script>
+const SUPABASE_URL="https://geeenernlwqwxoszdlzh.supabase.co";
+const SUPABASE_KEY="sb_publishable_tyPax7TLLxX8zgtY0Sje3w_tGGqyw6f";
+const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+let clips=[],filter="All";
+
+const esc=s=>String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));
+const validUrl=s=>{try{let u=new URL(s);return /^https?:$/.test(u.protocol)}catch{return false}};
+function show(which){home.classList.toggle("hidden",which!=="home");detailPage.classList.toggle("hidden",which!=="detail");adminPage.classList.toggle("hidden",which!=="admin")}
+
+async function loadClips(){
+ const {data,error}=await sb.from("clips").select("*").order("created_at",{ascending:false});
+ if(error){grid.innerHTML='<div class="meta">Could not load clips.</div>';return}
+ clips=data||[];render();
+}
+function render(){
+ const q=(search.value||"").toLowerCase();
+ const a=clips.filter(c=>(filter==="All"||c.category===filter)&&`${c.title} ${c.tags}`.toLowerCase().includes(q));
+ grid.innerHTML=a.length?a.map(c=>`<a class="card" href="?id=${encodeURIComponent(c.id)}"><div class="thumb">${c.thumbnail&&validUrl(c.thumbnail)?`<img src="${esc(c.thumbnail)}" alt="">`:'<div class="noxy">NOXY FX</div>'}</div><div class="body"><span class="badge">${esc(c.category)}</span><h3>${esc(c.title)}</h3><div class="meta">${esc(c.quality)} · ${esc(c.fps)} FPS · ${esc(c.duration)}</div><div class="foot"><span class="meta">${esc(c.creator)}</span><span class="view">VIEW →</span></div></div></a>`).join(""):'<div class="meta">No clips found.</div>';
+}
+async function loadDetail(id){
+ const {data,error}=await sb.from("clips").select("*").eq("id",id).single();
+ if(error||!data){detail.innerHTML='<p class="meta">Clip not found.</p>';return}
+ const img=data.thumbnail&&validUrl(data.thumbnail)?`<img src="${esc(data.thumbnail)}" alt="">`:'<div class="noxy">NOXY FX</div>';
+ detail.innerHTML=`<div class="detail"><a style="color:var(--green)" href="./">← BACK TO CLIPS</a><div class="big-thumb">${img}</div><span class="badge">${esc(data.category)}</span><h1>${esc(data.title)}</h1><div class="meta">Created by ${esc(data.creator)}</div><div class="info"><div class="box"><small>QUALITY</small>${esc(data.quality)}</div><div class="box"><small>FPS</small>${esc(data.fps)}</div><div class="box"><small>DURATION</small>${esc(data.duration)}</div><div class="box"><small>CATEGORY</small>${esc(data.category)}</div></div><p class="desc">${esc(data.description)}</p><p class="meta" style="margin-top:15px">Tags: ${esc(data.tags)}</p><a class="download" href="${esc(validUrl(data.drive_url)?data.drive_url:'#')}" target="_blank" rel="noopener">DOWNLOAD CLIP ↓</a></div>`;
+}
+async function login(){
+ const {error}=await sb.auth.signInWithPassword({email:email.value.trim(),password:password.value});
+ if(error){loginMsg.textContent=error.message;return}
+ showDashboard();
+}
+async function showDashboard(){loginBox.classList.add("hidden");dashboard.classList.remove("hidden");await adminList()}
+async function addClip(){
+ addMsg.textContent="";
+ const f=thumbnailFile.files[0];
+ const c={title:title.value.trim(),category:category.value,quality:quality.value.trim()||"HD",fps:fps.value.trim()||"30",duration:duration.value.trim()||"-",creator:creator.value.trim()||"NOXY Fx",tags:tags.value.trim(),description:description.value.trim(),thumbnail:"",drive_url:drive.value.trim()};
+ if(!c.title||!c.drive_url){addMsg.textContent="Title and Google Drive URL are required.";return}
+ if(!validUrl(c.drive_url)){addMsg.textContent="Enter a valid Google Drive URL.";return}
+ if(f){
+   if(f.size>5*1024*1024){addMsg.textContent="Thumbnail must be 5 MB or smaller.";return}
+   if(!["image/jpeg","image/png","image/webp"].includes(f.type)){addMsg.textContent="Use JPG, PNG or WebP.";return}
+   addMsg.textContent="Uploading thumbnail...";
+   const ext=f.name.split(".").pop().toLowerCase();
+   const path=`${crypto.randomUUID()}.${ext}`;
+   const up=await sb.storage.from("thumbnails").upload(path,f,{contentType:f.type,upsert:false});
+   if(up.error){addMsg.textContent="Thumbnail upload failed: "+up.error.message;return}
+   c.thumbnail=sb.storage.from("thumbnails").getPublicUrl(path).data.publicUrl;
+ }
+ const {error}=await sb.from("clips").insert(c);
+ if(error){addMsg.textContent="Error: "+error.message;return}
+ addMsg.textContent="✅ Clip published!";
+ document.querySelectorAll("#dashboard input[type=text],#dashboard input[type=url],#dashboard textarea").forEach(x=>x.value="");
+ thumbnailFile.value="";thumbnailPreview.classList.add("hidden");
+ await loadClips();await adminList();
+}
+async function adminList(){
+ const {data,error}=await sb.from("clips").select("id,title,category,thumbnail").order("created_at",{ascending:false});
+ if(error){adminClips.innerHTML='<p class="meta">Could not load clips.</p>';return}
+ adminClips.innerHTML=(data||[]).map(c=>`<div class="row"><span>${esc(c.title)}<br><small class="meta">${esc(c.category)}</small></span><button class="delete" data-id="${c.id}">DELETE</button></div>`).join("")||'<p class="meta">No clips yet.</p>';
+ document.querySelectorAll(".delete").forEach(b=>b.onclick=()=>deleteClip(b.dataset.id));
+}
+async function deleteClip(id){
+ if(!confirm("Delete this clip?"))return;
+ const {error}=await sb.from("clips").delete().eq("id",id);
+ if(error){alert(error.message);return}
+ await loadClips();await adminList();
+}
+async function logout(){await sb.auth.signOut();location.reload()}
+
+search.addEventListener("input",render);
+document.querySelectorAll(".cat").forEach(b=>b.onclick=()=>{filter=b.dataset.cat;document.querySelectorAll(".cat").forEach(x=>x.classList.remove("active"));b.classList.add("active");render()});
+thumbnailFile.addEventListener("change",()=>{const f=thumbnailFile.files[0];if(!f){thumbnailPreview.classList.add("hidden");return}thumbnailPreview.src=URL.createObjectURL(f);thumbnailPreview.classList.remove("hidden")});
+loginBtn.onclick=login;publishBtn.onclick=addClip;logoutBtn.onclick=logout;
+async function init(){
+ const p=new URLSearchParams(location.search);
+ if(p.has("admin")){show("admin");const {data:{session}}=await sb.auth.getSession();if(session)showDashboard()}
+ else if(p.has("id")){show("detail");await loadDetail(p.get("id"))}
+ else{show("home");await loadClips()}
+}
+init();
+</script>
+</body>
+</html>
