@@ -2,694 +2,139 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="NOXY Fx — high-quality clip resources for video editors.">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>NOXY Fx — Edit Without Limits</title>
-
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
 <style>
-:root{
-  --bg:#050705;
-  --panel:#0a0f0c;
-  --panel2:#0d1510;
-  --text:#f2fff7;
-  --muted:#819087;
-  --green:#39ff88;
-  --green-dark:#123d25;
-  --border:#1b2a21;
-  --danger:#ff5555;
-}
-*{box-sizing:border-box;margin:0;padding:0}
-html{scroll-behavior:smooth}
-body{
-  min-height:100vh;
-  background:
-    radial-gradient(circle at 80% 0%,rgba(57,255,136,.07),transparent 28rem),
-    var(--bg);
-  color:var(--text);
-  font-family:Arial,Helvetica,sans-serif;
-}
-a{color:inherit;text-decoration:none}
-button,input,textarea,select{font:inherit}
-button{cursor:pointer}
-.hidden{display:none!important}
-
-nav{
-  position:sticky;top:0;z-index:100;
-  height:68px;
-  display:flex;align-items:center;justify-content:space-between;
-  padding:0 6%;
-  background:rgba(5,7,5,.88);
-  backdrop-filter:blur(14px);
-  border-bottom:1px solid var(--border);
-}
-.logo{font-size:23px;font-weight:900;letter-spacing:2px}
-.logo span{color:var(--green)}
-.navlinks{display:flex;align-items:center;gap:24px}
-.navlinks a{color:#aab7af;font-size:14px}
-.navlinks a:hover{color:var(--green)}
-.admin-link{
-  color:var(--green)!important;
-  border:1px solid var(--green);
-  padding:8px 14px;border-radius:7px;
-}
-
-.hero{
-  max-width:1200px;margin:auto;
-  padding:105px 6% 80px;
-}
-.kicker{color:var(--green);font-weight:800;letter-spacing:3px;font-size:12px}
-.hero h1{
-  font-size:clamp(48px,9vw,92px);
-  line-height:.92;
-  letter-spacing:-5px;
-  margin:18px 0;
-}
-.hero h1 span{color:var(--green)}
-.hero p{
-  max-width:620px;color:var(--muted);
-  font-size:17px;line-height:1.7;
-}
-.hero-actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:30px}
-.btn{
-  display:inline-flex;align-items:center;justify-content:center;
-  border:1px solid var(--green);
-  background:var(--green);color:#031008;
-  padding:12px 20px;border-radius:7px;
-  font-weight:900;
-}
-.btn:hover{filter:brightness(1.08)}
-.btn.secondary{background:transparent;color:var(--text);border-color:var(--border)}
-.btn.danger{background:transparent;color:var(--danger);border-color:var(--danger)}
-
-.container,.page,.admin{
-  max-width:1200px;margin:auto;
-  padding:30px 6% 80px;
-}
-.section-head{
-  display:flex;align-items:center;justify-content:space-between;
-  gap:18px;margin-bottom:22px;
-}
-.section-head h2{font-size:28px}
-.search{
-  width:290px;max-width:100%;
-  padding:12px 14px;
-  background:var(--panel);color:var(--text);
-  border:1px solid var(--border);border-radius:7px;outline:0;
-}
-.search:focus{border-color:var(--green)}
-
-.categories{
-  display:flex;gap:9px;overflow-x:auto;
-  padding-bottom:22px;
-}
-.category{
-  white-space:nowrap;
-  padding:8px 15px;border-radius:30px;
-  border:1px solid var(--border);
-  background:var(--panel);color:#aab7af;
-}
-.category.active,.category:hover{
-  background:var(--green);border-color:var(--green);color:#001b09;
-}
-
-.grid{
-  display:grid;grid-template-columns:repeat(3,1fr);gap:20px;
-}
-.card{
-  display:block;overflow:hidden;
-  background:var(--panel);
-  border:1px solid var(--border);
-  border-radius:12px;
-  transition:transform .18s,border-color .18s;
-}
-.card:hover{transform:translateY(-4px);border-color:#31563e}
-.thumb{
-  height:190px;
-  display:flex;align-items:center;justify-content:center;
-  background:
-    radial-gradient(circle at 50% 35%,#173d28,#071009 68%);
-  overflow:hidden;
-}
-.thumb img{width:100%;height:100%;object-fit:cover;display:block}
-.noxy{
-  color:#245237;font-weight:900;letter-spacing:5px;font-size:24px;
-}
-.card-body{padding:17px}
-.badge{
-  display:inline-block;
-  padding:5px 9px;border-radius:4px;
-  background:var(--green-dark);color:var(--green);
-  font-size:11px;font-weight:800;
-  margin-bottom:9px;
-}
-.card h3{font-size:18px;margin-bottom:8px}
-.meta{color:var(--muted);font-size:12px}
-.card-footer{
-  display:flex;align-items:center;justify-content:space-between;
-  margin-top:17px;
-}
-.view{color:var(--green);font-size:13px;font-weight:900}
-
-.loading,.empty{
-  grid-column:1/-1;
-  text-align:center;color:var(--muted);
-  padding:55px 20px;
-  border:1px dashed var(--border);
-  border-radius:10px;
-}
-
-.detail{max-width:1000px;margin:auto;padding-top:20px}
-.back{color:var(--green);font-weight:800;font-size:13px}
-.detail-thumb{
-  width:100%;height:450px;margin-top:22px;
-  display:flex;align-items:center;justify-content:center;
-  overflow:hidden;background:var(--panel);
-  border:1px solid var(--border);border-radius:12px;
-}
-.detail-thumb img{width:100%;height:100%;object-fit:cover}
-.detail h1{font-size:clamp(32px,5vw,48px);margin:25px 0 8px}
-.detail-desc{color:var(--muted);line-height:1.7;margin:20px 0}
-.info{
-  display:grid;grid-template-columns:repeat(4,1fr);
-  gap:10px;margin:25px 0;
-}
-.info-box{
-  padding:15px;background:var(--panel);
-  border:1px solid var(--border);border-radius:8px;
-}
-.info-box small{display:block;color:var(--muted);margin-bottom:6px}
-.download{
-  display:inline-flex;margin-top:10px;
-  padding:15px 24px;border-radius:7px;
-  background:var(--green);color:#031008;
-  font-weight:900;
-}
-
-.form{
-  max-width:800px;margin:auto;
-  background:var(--panel);
-  border:1px solid var(--border);
-  border-radius:12px;padding:25px;
-}
-.form h2{margin-bottom:22px}
-label{display:block;color:#b8c5bd;font-size:13px;margin:15px 0 7px}
-input,textarea,select{
-  width:100%;padding:12px;
-  background:#070a08;color:var(--text);
-  border:1px solid var(--border);border-radius:6px;
-  outline:0;
-}
-input:focus,textarea:focus,select:focus{border-color:var(--green)}
-textarea{min-height:110px;resize:vertical}
-.message{margin-top:14px;min-height:18px;font-size:14px}
-.admin-list{max-width:800px;margin:40px auto 0}
-.admin-list h2{margin-bottom:18px}
-.admin-item{
-  display:flex;align-items:center;justify-content:space-between;
-  gap:15px;padding:14px;margin-bottom:10px;
-  background:var(--panel);border:1px solid var(--border);border-radius:8px;
-}
-.admin-item small{color:var(--muted)}
-.admin-item .delete{
-  flex-shrink:0;padding:8px 12px;
-  background:transparent;color:var(--danger);
-  border:1px solid var(--danger);border-radius:5px;
-}
-
-footer{
-  border-top:1px solid var(--border);
-  text-align:center;padding:34px 20px;
-  color:#657069;font-size:13px;
-}
-
-@media(max-width:800px){
-  .navlinks{gap:10px}
-  .navlinks a:not(.admin-link){display:none}
-  .hero{padding-top:75px}
-  .grid{grid-template-columns:1fr}
-  .info{grid-template-columns:repeat(2,1fr)}
-  .detail-thumb{height:260px}
-  .section-head{align-items:stretch;flex-direction:column}
-  .search{width:100%}
-}
+:root{--bg:#050705;--card:#0b100d;--text:#f1fff6;--muted:#829088;--green:#39ff88;--border:#1c2921}
+*{box-sizing:border-box;margin:0;padding:0}body{background:var(--bg);color:var(--text);font-family:Arial,sans-serif}a{text-decoration:none;color:inherit}button,input,textarea,select{font:inherit}
+nav{height:70px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 6%;position:sticky;top:0;background:#050705ee;backdrop-filter:blur(14px);z-index:5}.logo{font-size:24px;font-weight:900;letter-spacing:2px}.logo span{color:var(--green)}nav a{color:#aab6ae;margin-left:20px;font-size:14px}.admin-link{border:1px solid var(--green);color:var(--green)!important;padding:8px 13px;border-radius:7px}
+.hero{max-width:1200px;margin:auto;padding:100px 6% 70px}.hero small{color:var(--green);letter-spacing:3px;font-weight:bold}.hero h1{font-size:clamp(48px,8vw,90px);line-height:.94;letter-spacing:-4px;margin:18px 0}.hero h1 span{color:var(--green)}.hero p{max-width:620px;color:var(--muted);font-size:17px;line-height:1.7}.btn{display:inline-block;border:0;background:var(--green);color:#031008;padding:13px 22px;border-radius:7px;font-weight:bold;margin-top:25px;cursor:pointer}
+.container,.admin,.detail-page{max-width:1200px;margin:auto;padding:35px 6% 80px}.head{display:flex;justify-content:space-between;gap:15px;align-items:center;margin-bottom:22px}.head h2{font-size:28px}.search{width:290px;max-width:100%;background:var(--card);border:1px solid var(--border);color:#fff;padding:12px;border-radius:7px}.cats{display:flex;gap:9px;overflow:auto;margin-bottom:22px}.cat{white-space:nowrap;background:var(--card);border:1px solid var(--border);color:#aaa;padding:8px 15px;border-radius:30px}.cat.active{background:var(--green);color:#001b09;border-color:var(--green)}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}.card{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden}.thumb{height:190px;background:radial-gradient(circle,#173d28,#071009 65%);display:flex;align-items:center;justify-content:center}.thumb img{width:100%;height:100%;object-fit:cover}.noxy{color:#245237;font-weight:900;letter-spacing:5px;font-size:24px}.body{padding:17px}.badge{display:inline-block;font-size:11px;color:var(--green);background:#123522;padding:5px 9px;border-radius:4px}.body h3{margin:10px 0 7px}.meta{color:var(--muted);font-size:12px}.foot{display:flex;justify-content:space-between;margin-top:16px}.view{color:var(--green);font-weight:bold;font-size:12px}
+.detail-page{max-width:1000px}.big-thumb{height:440px;background:#0b100d;border:1px solid var(--border);border-radius:12px;display:flex;align-items:center;justify-content:center;overflow:hidden;margin-top:20px}.big-thumb img{width:100%;height:100%;object-fit:cover}.detail-page h1{font-size:44px;margin:25px 0 10px}.info{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:25px 0}.box{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:15px}.box small{display:block;color:var(--muted);margin-bottom:6px}.desc{color:var(--muted);line-height:1.7}.download{display:inline-block;background:var(--green);color:#031008;font-weight:900;padding:16px 25px;border-radius:7px;margin-top:20px}
+.form{background:var(--card);border:1px solid var(--border);padding:25px;border-radius:12px}.form h2{margin-bottom:22px}.form label{display:block;color:#b9c4bd;font-size:13px;margin:14px 0 7px}.form input,.form textarea,.form select{width:100%;background:#070a08;color:#fff;border:1px solid var(--border);padding:12px;border-radius:6px}.form textarea{min-height:100px}.file{padding:9px!important}.preview{width:100%;max-height:220px;object-fit:contain;background:#050505;border:1px solid var(--border);border-radius:8px;margin-top:10px}.msg{margin-top:14px;color:var(--muted)}.row{display:flex;justify-content:space-between;gap:15px;align-items:center;padding:14px;border:1px solid var(--border);background:var(--card);border-radius:8px;margin-top:10px}.delete{background:transparent;color:#ff6666;border:1px solid #733;border-radius:5px;padding:8px 12px}footer{border-top:1px solid var(--border);text-align:center;padding:35px;color:#657069;font-size:13px}.hidden{display:none!important}
+@media(max-width:800px){nav a:not(.admin-link){display:none}.hero{padding-top:70px}.grid{grid-template-columns:1fr}.head{flex-direction:column;align-items:stretch}.search{width:100%}.info{grid-template-columns:1fr 1fr}.big-thumb{height:260px}.detail-page h1{font-size:32px}}
 </style>
 </head>
-
 <body>
+<nav><a href="./" class="logo">NOXY<span>FX</span></a><div><a href="./">Home</a><a href="#clips">Clips</a><a class="admin-link" href="?admin=1">Admin</a></div></nav>
 
-<nav>
-  <a class="logo" href="./">NOXY<span>FX</span></a>
-  <div class="navlinks">
-    <a href="./">Home</a>
-    <a href="#clips">Clips</a>
-    <a class="admin-link" href="?admin=1">Admin</a>
-  </div>
-</nav>
+<main id="home">
+<section class="hero"><small>THE EDITOR'S RESOURCE</small><h1>EDIT WITHOUT<br><span>LIMITS.</span></h1><p>High-quality reversed clips, Twixtors and editing resources for creators.</p><a class="btn" href="#clips">EXPLORE CLIPS</a></section>
+<section class="container" id="clips"><div class="head"><h2>Recently Added</h2><input id="search" class="search" placeholder="Search clips..."></div>
+<div class="cats"><button class="cat active" data-cat="All">All</button><button class="cat" data-cat="Twixtor">Twixtor</button><button class="cat" data-cat="Reversed">Reversed</button><button class="cat" data-cat="Other">Other</button></div>
+<div id="grid" class="grid"><div class="meta">Loading clips...</div></div></section></main>
 
-<main id="homePage">
-  <section class="hero">
-    <div class="kicker">THE EDITOR'S RESOURCE</div>
-    <h1>EDIT WITHOUT<br><span>LIMITS.</span></h1>
-    <p>Discover high-quality clips, Twixtors, reverses and resources made for the next generation of video editors.</p>
-    <div class="hero-actions">
-      <a class="btn" href="#clips">EXPLORE CLIPS</a>
-      <a class="btn secondary" href="?admin=1">ADMIN PANEL</a>
-    </div>
-  </section>
-
-  <section class="container" id="clips">
-    <div class="section-head">
-      <h2>Recently Added</h2>
-      <input id="search" class="search" placeholder="Search clips..." autocomplete="off">
-    </div>
-
-    <div class="categories">
-      <button class="category active" data-category="All">All</button>
-      <button class="category" data-category="Twixtor">Twixtor</button>
-      <button class="category" data-category="Reversed">Reversed</button>
-      <button class="category" data-category="Other">Other</button>
-    </div>
-
-    <div id="clipGrid" class="grid">
-      <div class="loading">Loading clips...</div>
-    </div>
-  </section>
-</main>
-
-<section id="detailPage" class="page hidden">
-  <div id="detailContent"></div>
-</section>
+<section id="detailPage" class="detail-page hidden"><div id="detail"></div></section>
 
 <section id="adminPage" class="admin hidden">
-  <div id="loginBox" class="form">
-    <h2>NOXY Fx Admin</h2>
+<div id="loginBox" class="form"><h2>NOXY Fx Admin</h2><label>Email</label><input id="email" type="email" placeholder="Admin email"><label>Password</label><input id="password" type="password" placeholder="Password"><button id="loginBtn" class="btn">LOGIN</button><p id="loginMsg" class="msg"></p></div>
+<div id="dashboard" class="hidden">
+<div class="form"><h2>Add New Clip</h2>
+<label>Title *</label><input id="title" placeholder="Example: Thor Twixtor">
+<label>Category</label><select id="category"><option>Twixtor</option><option>Reversed</option><option>Other</option></select>
+<label>Quality</label><input id="quality" value="4K">
+<label>FPS</label><input id="fps" value="60">
+<label>Duration</label><input id="duration" placeholder="00:15">
+<label>Creator</label><input id="creator" value="NOXY Fx">
+<label>Tags</label><input id="tags" placeholder="thor, marvel, twixtor">
+<label>Description</label><textarea id="description" placeholder="Describe the clip..."></textarea>
 
-    <label for="loginEmail">Email</label>
-    <input id="loginEmail" type="email" placeholder="Admin email" autocomplete="username">
+<label>Thumbnail — choose from your phone gallery</label>
+<input id="thumbnailFile" class="file" type="file" accept="image/jpeg,image/png,image/webp">
+<img id="thumbnailPreview" class="preview hidden" alt="Thumbnail preview">
 
-    <label for="loginPassword">Password</label>
-    <input id="loginPassword" type="password" placeholder="Password" autocomplete="current-password">
+<label>Google Drive Download URL *</label>
+<input id="drive" type="url" placeholder="https://drive.google.com/...">
 
-    <button id="loginBtn" class="btn" type="button">LOGIN</button>
-    <p id="loginMessage" class="message"></p>
-  </div>
-
-  <div id="dashboard" class="hidden">
-    <div class="form">
-      <h2>Add New Clip</h2>
-
-      <label for="title">Title *</label>
-      <input id="title" placeholder="Example: Spider-Man Swing">
-
-      <label for="category">Category</label>
-      <select id="category">
-        <option>Twixtor</option>
-        <option>Reversed</option>
-        <option>Other</option>
-      </select>
-
-      <label for="quality">Quality</label>
-      <input id="quality" value="HD">
-
-      <label for="fps">FPS</label>
-      <input id="fps" value="30">
-
-      <label for="duration">Duration</label>
-      <input id="duration" placeholder="00:15">
-
-      <label for="creator">Creator</label>
-      <input id="creator" value="NOXY Fx">
-
-      <label for="tags">Tags</label>
-      <input id="tags" placeholder="spiderman, marvel, twixtor">
-
-      <label for="description">Description</label>
-      <textarea id="description" placeholder="Describe the clip..."></textarea>
-
-      <label for="thumbnail">Thumbnail URL</label>
-      <input id="thumbnail" type="url" placeholder="https://...">
-
-      <label for="drive">Google Drive Download URL *</label>
-      <input id="drive" type="url" placeholder="https://drive.google.com/...">
-
-      <button id="publishBtn" class="btn" type="button">PUBLISH CLIP</button>
-      <p id="addMessage" class="message"></p>
-    </div>
-
-    <div class="admin-list">
-      <h2>Your Clips</h2>
-      <div id="adminClips"></div>
-    </div>
-
-    <button id="logoutBtn" class="btn secondary" type="button" style="display:flex;margin:25px auto 0">LOGOUT</button>
-  </div>
-</section>
+<button id="publishBtn" class="btn">PUBLISH CLIP</button><p id="addMsg" class="msg"></p>
+</div>
+<div class="admin-list"><h2 style="margin:35px 0 15px">Your Clips</h2><div id="adminClips"></div></div>
+<button id="logoutBtn" class="btn" style="background:transparent;color:#fff;border:1px solid var(--border)">LOGOUT</button>
+</div></section>
 
 <footer>© 2026 NOXY Fx — Edit Without Limits.</footer>
 
 <script>
-/* =========================================================
-   NOXY FX CONFIG
-   The publishable key is safe for browser use.
-   NEVER put a Supabase secret/service-role key here.
-========================================================= */
-const SUPABASE_URL = "https://vyteqcaffyxxialkadgk.supabase.co";
-const SUPABASE_KEY = "sb_publishable_zFvoXus3JxmbGHFrqpcmQw_Yt_GwX4Z";
+const SUPABASE_URL="https://vyteqcaffyxxialkadgk.supabase.co";
+const SUPABASE_KEY="sb_publishable_zFvoXus3JxmbGHFrqpcmQw_Yt_GwX4Z";
+const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+let clips=[],filter="All";
 
-const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const esc=s=>String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));
+const validUrl=s=>{try{let u=new URL(s);return /^https?:$/.test(u.protocol)}catch{return false}};
+function show(which){home.classList.toggle("hidden",which!=="home");detailPage.classList.toggle("hidden",which!=="detail");adminPage.classList.toggle("hidden",which!=="admin")}
 
-let clips = [];
-let currentCategory = "All";
-
-/* ---------- Helpers ---------- */
-function escapeHTML(value){
-  return String(value ?? "")
-    .replaceAll("&","&amp;")
-    .replaceAll("<","&lt;")
-    .replaceAll(">","&gt;")
-    .replaceAll('"',"&quot;")
-    .replaceAll("'","&#039;");
-}
-
-function isValidUrl(value){
-  try{
-    const u = new URL(value);
-    return u.protocol === "http:" || u.protocol === "https:";
-  }catch{
-    return false;
-  }
-}
-
-function showPage(name){
-  document.getElementById("homePage").classList.toggle("hidden", name !== "home");
-  document.getElementById("detailPage").classList.toggle("hidden", name !== "detail");
-  document.getElementById("adminPage").classList.toggle("hidden", name !== "admin");
-}
-
-/* ---------- Public clips ---------- */
 async function loadClips(){
-  const grid = document.getElementById("clipGrid");
-  if(!grid) return;
-
-  const {data,error} = await sb
-    .from("clips")
-    .select("*")
-    .order("created_at",{ascending:false});
-
-  if(error){
-    console.error(error);
-    grid.innerHTML = '<div class="empty">Failed to load clips. Check your Supabase table and policies.</div>';
-    return;
-  }
-
-  clips = data || [];
-  renderClips();
+ const {data,error}=await sb.from("clips").select("*").order("created_at",{ascending:false});
+ if(error){grid.innerHTML='<div class="meta">Could not load clips.</div>';return}
+ clips=data||[];render();
 }
-
-function renderClips(){
-  const grid = document.getElementById("clipGrid");
-  if(!grid) return;
-
-  const search = (document.getElementById("search")?.value || "").trim().toLowerCase();
-
-  const filtered = clips.filter(c => {
-    const text = `${c.title || ""} ${c.category || ""} ${c.tags || ""}`.toLowerCase();
-    return text.includes(search) &&
-      (currentCategory === "All" || c.category === currentCategory);
-  });
-
-  if(!filtered.length){
-    grid.innerHTML = '<div class="empty">No clips found.</div>';
-    return;
-  }
-
-  grid.innerHTML = filtered.map(c => {
-    const thumb = c.thumbnail && isValidUrl(c.thumbnail)
-      ? `<img src="${escapeHTML(c.thumbnail)}" alt="${escapeHTML(c.title)}" loading="lazy">`
-      : `<div class="noxy">NOXY FX</div>`;
-
-    return `
-      <a class="card" href="?id=${encodeURIComponent(c.id)}">
-        <div class="thumb">${thumb}</div>
-        <div class="card-body">
-          <span class="badge">${escapeHTML(c.category || "Other")}</span>
-          <h3>${escapeHTML(c.title)}</h3>
-          <div class="meta">
-            ${escapeHTML(c.quality || "HD")} ·
-            ${escapeHTML(c.fps || "30")} FPS ·
-            ${escapeHTML(c.duration || "-")}
-          </div>
-          <div class="card-footer">
-            <span class="meta">${escapeHTML(c.creator || "NOXY Fx")}</span>
-            <span class="view">VIEW →</span>
-          </div>
-        </div>
-      </a>`;
-  }).join("");
+function render(){
+ const q=(search.value||"").toLowerCase();
+ const a=clips.filter(c=>(filter==="All"||c.category===filter)&&`${c.title} ${c.tags}`.toLowerCase().includes(q));
+ grid.innerHTML=a.length?a.map(c=>`<a class="card" href="?id=${encodeURIComponent(c.id)}"><div class="thumb">${c.thumbnail&&validUrl(c.thumbnail)?`<img src="${esc(c.thumbnail)}" alt="">`:'<div class="noxy">NOXY FX</div>'}</div><div class="body"><span class="badge">${esc(c.category)}</span><h3>${esc(c.title)}</h3><div class="meta">${esc(c.quality)} · ${esc(c.fps)} FPS · ${esc(c.duration)}</div><div class="foot"><span class="meta">${esc(c.creator)}</span><span class="view">VIEW →</span></div></div></a>`).join(""):'<div class="meta">No clips found.</div>';
 }
-
-/* ---------- Detail page ---------- */
 async function loadDetail(id){
-  const content = document.getElementById("detailContent");
-
-  if(!id){
-    location.href = "./";
-    return;
-  }
-
-  content.innerHTML = '<div class="loading">Loading clip...</div>';
-
-  const {data,error} = await sb
-    .from("clips")
-    .select("*")
-    .eq("id",id)
-    .single();
-
-  if(error || !data){
-    content.innerHTML = `
-      <div class="empty">
-        <h2 style="margin-bottom:12px">Clip not found.</h2>
-        <a class="back" href="./">← BACK TO CLIPS</a>
-      </div>`;
-    return;
-  }
-
-  const thumb = data.thumbnail && isValidUrl(data.thumbnail)
-    ? `<img src="${escapeHTML(data.thumbnail)}" alt="${escapeHTML(data.title)}">`
-    : `<div class="noxy">NOXY FX</div>`;
-
-  const safeDrive = isValidUrl(data.drive_url) ? data.drive_url : "#";
-
-  content.innerHTML = `
-    <div class="detail">
-      <a class="back" href="./">← BACK TO CLIPS</a>
-
-      <div class="detail-thumb">${thumb}</div>
-
-      <span class="badge" style="margin-top:25px">${escapeHTML(data.category || "Other")}</span>
-      <h1>${escapeHTML(data.title)}</h1>
-      <div class="meta">Created by ${escapeHTML(data.creator || "NOXY Fx")}</div>
-
-      <div class="info">
-        <div class="info-box"><small>QUALITY</small>${escapeHTML(data.quality || "-")}</div>
-        <div class="info-box"><small>FPS</small>${escapeHTML(data.fps || "-")}</div>
-        <div class="info-box"><small>DURATION</small>${escapeHTML(data.duration || "-")}</div>
-        <div class="info-box"><small>CATEGORY</small>${escapeHTML(data.category || "-")}</div>
-      </div>
-
-      <p class="detail-desc">${escapeHTML(data.description || "NOXY Fx clip resource.")}</p>
-
-      ${data.tags ? `<p class="meta">Tags: ${escapeHTML(data.tags)}</p>` : ""}
-
-      <a class="download"
-         href="${escapeHTML(safeDrive)}"
-         target="_blank"
-         rel="noopener noreferrer">
-        DOWNLOAD CLIP ↓
-      </a>
-    </div>`;
+ const {data,error}=await sb.from("clips").select("*").eq("id",id).single();
+ if(error||!data){detail.innerHTML='<p class="meta">Clip not found.</p>';return}
+ const img=data.thumbnail&&validUrl(data.thumbnail)?`<img src="${esc(data.thumbnail)}" alt="">`:'<div class="noxy">NOXY FX</div>';
+ detail.innerHTML=`<div class="detail"><a style="color:var(--green)" href="./">← BACK TO CLIPS</a><div class="big-thumb">${img}</div><span class="badge">${esc(data.category)}</span><h1>${esc(data.title)}</h1><div class="meta">Created by ${esc(data.creator)}</div><div class="info"><div class="box"><small>QUALITY</small>${esc(data.quality)}</div><div class="box"><small>FPS</small>${esc(data.fps)}</div><div class="box"><small>DURATION</small>${esc(data.duration)}</div><div class="box"><small>CATEGORY</small>${esc(data.category)}</div></div><p class="desc">${esc(data.description)}</p><p class="meta" style="margin-top:15px">Tags: ${esc(data.tags)}</p><a class="download" href="${esc(validUrl(data.drive_url)?data.drive_url:'#')}" target="_blank" rel="noopener">DOWNLOAD CLIP ↓</a></div>`;
 }
-
-/* ---------- Admin ---------- */
 async function login(){
-  const email = document.getElementById("loginEmail").value.trim();
-  const password = document.getElementById("loginPassword").value;
-  const msg = document.getElementById("loginMessage");
-
-  msg.textContent = "";
-
-  if(!email || !password){
-    msg.textContent = "Enter your admin email and password.";
-    return;
-  }
-
-  const {error} = await sb.auth.signInWithPassword({email,password});
-
-  if(error){
-    msg.textContent = error.message;
-    return;
-  }
-
-  showDashboard();
+ const {error}=await sb.auth.signInWithPassword({email:email.value.trim(),password:password.value});
+ if(error){loginMsg.textContent=error.message;return}
+ showDashboard();
 }
-
-async function showDashboard(){
-  document.getElementById("loginBox").classList.add("hidden");
-  document.getElementById("dashboard").classList.remove("hidden");
-  await loadAdminClips();
-}
-
+async function showDashboard(){loginBox.classList.add("hidden");dashboard.classList.remove("hidden");await adminList()}
 async function addClip(){
-  const msg = document.getElementById("addMessage");
-  msg.textContent = "";
-
-  const clip = {
-    title: document.getElementById("title").value.trim(),
-    category: document.getElementById("category").value,
-    quality: document.getElementById("quality").value.trim() || "HD",
-    fps: document.getElementById("fps").value.trim() || "30",
-    duration: document.getElementById("duration").value.trim() || "-",
-    creator: document.getElementById("creator").value.trim() || "NOXY Fx",
-    tags: document.getElementById("tags").value.trim(),
-    description: document.getElementById("description").value.trim(),
-    thumbnail: document.getElementById("thumbnail").value.trim(),
-    drive_url: document.getElementById("drive").value.trim()
-  };
-
-  if(!clip.title || !clip.drive_url){
-    msg.textContent = "Title and Google Drive URL are required.";
-    return;
-  }
-
-  if(!isValidUrl(clip.drive_url)){
-    msg.textContent = "Enter a valid Google Drive URL.";
-    return;
-  }
-
-  if(clip.thumbnail && !isValidUrl(clip.thumbnail)){
-    msg.textContent = "Thumbnail must be a valid URL or left empty.";
-    return;
-  }
-
-  const {error} = await sb.from("clips").insert(clip);
-
-  if(error){
-    console.error(error);
-    msg.textContent = "Error: " + error.message;
-    return;
-  }
-
-  msg.textContent = "✅ Clip published!";
-
-  document.querySelectorAll("#dashboard input, #dashboard textarea").forEach(el => {
-    if(el.id !== "creator") el.value = "";
-  });
-  document.getElementById("quality").value = "HD";
-  document.getElementById("fps").value = "30";
-  document.getElementById("creator").value = "NOXY Fx";
-
-  await loadClips();
-  await loadAdminClips();
+ addMsg.textContent="";
+ const f=thumbnailFile.files[0];
+ const c={title:title.value.trim(),category:category.value,quality:quality.value.trim()||"HD",fps:fps.value.trim()||"30",duration:duration.value.trim()||"-",creator:creator.value.trim()||"NOXY Fx",tags:tags.value.trim(),description:description.value.trim(),thumbnail:"",drive_url:drive.value.trim()};
+ if(!c.title||!c.drive_url){addMsg.textContent="Title and Google Drive URL are required.";return}
+ if(!validUrl(c.drive_url)){addMsg.textContent="Enter a valid Google Drive URL.";return}
+ if(f){
+   if(f.size>5*1024*1024){addMsg.textContent="Thumbnail must be 5 MB or smaller.";return}
+   if(!["image/jpeg","image/png","image/webp"].includes(f.type)){addMsg.textContent="Use JPG, PNG or WebP.";return}
+   addMsg.textContent="Uploading thumbnail...";
+   const ext=f.name.split(".").pop().toLowerCase();
+   const path=`${crypto.randomUUID()}.${ext}`;
+   const up=await sb.storage.from("thumbnails").upload(path,f,{contentType:f.type,upsert:false});
+   if(up.error){addMsg.textContent="Thumbnail upload failed: "+up.error.message;return}
+   c.thumbnail=sb.storage.from("thumbnails").getPublicUrl(path).data.publicUrl;
+ }
+ const {error}=await sb.from("clips").insert(c);
+ if(error){addMsg.textContent="Error: "+error.message;return}
+ addMsg.textContent="✅ Clip published!";
+ document.querySelectorAll("#dashboard input[type=text],#dashboard input[type=url],#dashboard textarea").forEach(x=>x.value="");
+ thumbnailFile.value="";thumbnailPreview.classList.add("hidden");
+ await loadClips();await adminList();
 }
-
-async function loadAdminClips(){
-  const box = document.getElementById("adminClips");
-  if(!box) return;
-
-  const {data,error} = await sb
-    .from("clips")
-    .select("id,title,category,created_at")
-    .order("created_at",{ascending:false});
-
-  if(error){
-    box.innerHTML = `<p class="message">${escapeHTML(error.message)}</p>`;
-    return;
-  }
-
-  if(!data?.length){
-    box.innerHTML = '<p class="meta">No clips published yet.</p>';
-    return;
-  }
-
-  box.innerHTML = data.map(c => `
-    <div class="admin-item">
-      <div>
-        <strong>${escapeHTML(c.title)}</strong><br>
-        <small>${escapeHTML(c.category || "Other")}</small>
-      </div>
-      <button class="delete" type="button" data-delete-id="${escapeHTML(c.id)}">DELETE</button>
-    </div>
-  `).join("");
-
-  box.querySelectorAll("[data-delete-id]").forEach(btn => {
-    btn.addEventListener("click", () => deleteClip(btn.dataset.deleteId));
-  });
+async function adminList(){
+ const {data,error}=await sb.from("clips").select("id,title,category,thumbnail").order("created_at",{ascending:false});
+ if(error){adminClips.innerHTML='<p class="meta">Could not load clips.</p>';return}
+ adminClips.innerHTML=(data||[]).map(c=>`<div class="row"><span>${esc(c.title)}<br><small class="meta">${esc(c.category)}</small></span><button class="delete" data-id="${c.id}">DELETE</button></div>`).join("")||'<p class="meta">No clips yet.</p>';
+ document.querySelectorAll(".delete").forEach(b=>b.onclick=()=>deleteClip(b.dataset.id));
 }
-
 async function deleteClip(id){
-  if(!confirm("Delete this clip?")) return;
-
-  const {error} = await sb.from("clips").delete().eq("id",id);
-
-  if(error){
-    alert("Delete failed: " + error.message);
-    return;
-  }
-
-  await loadClips();
-  await loadAdminClips();
+ if(!confirm("Delete this clip?"))return;
+ const {error}=await sb.from("clips").delete().eq("id",id);
+ if(error){alert(error.message);return}
+ await loadClips();await adminList();
 }
+async function logout(){await sb.auth.signOut();location.reload()}
 
-async function logout(){
-  await sb.auth.signOut();
-  document.getElementById("dashboard").classList.add("hidden");
-  document.getElementById("loginBox").classList.remove("hidden");
-}
-
-/* ---------- Events ---------- */
-document.getElementById("search").addEventListener("input",renderClips);
-
-document.querySelectorAll(".category").forEach(button => {
-  button.addEventListener("click",() => {
-    currentCategory = button.dataset.category;
-    document.querySelectorAll(".category").forEach(b => b.classList.remove("active"));
-    button.classList.add("active");
-    renderClips();
-  });
-});
-
-document.getElementById("loginBtn").addEventListener("click",login);
-document.getElementById("publishBtn").addEventListener("click",addClip);
-document.getElementById("logoutBtn").addEventListener("click",logout);
-
-document.getElementById("loginPassword").addEventListener("keydown",e => {
-  if(e.key === "Enter") login();
-});
-
-/* ---------- Router ---------- */
+search.addEventListener("input",render);
+document.querySelectorAll(".cat").forEach(b=>b.onclick=()=>{filter=b.dataset.cat;document.querySelectorAll(".cat").forEach(x=>x.classList.remove("active"));b.classList.add("active");render()});
+thumbnailFile.addEventListener("change",()=>{const f=thumbnailFile.files[0];if(!f){thumbnailPreview.classList.add("hidden");return}thumbnailPreview.src=URL.createObjectURL(f);thumbnailPreview.classList.remove("hidden")});
+loginBtn.onclick=login;publishBtn.onclick=addClip;logoutBtn.onclick=logout;
 async function init(){
-  const params = new URLSearchParams(location.search);
-
-  if(params.has("admin")){
-    showPage("admin");
-
-    const {data:{session}} = await sb.auth.getSession();
-    if(session) showDashboard();
-    return;
-  }
-
-  if(params.has("id")){
-    showPage("detail");
-    await loadDetail(params.get("id"));
-    return;
-  }
-
-  showPage("home");
-  await loadClips();
+ const p=new URLSearchParams(location.search);
+ if(p.has("admin")){show("admin");const {data:{session}}=await sb.auth.getSession();if(session)showDashboard()}
+ else if(p.has("id")){show("detail");await loadDetail(p.get("id"))}
+ else{show("home");await loadClips()}
 }
-
 init();
 </script>
 </body>
